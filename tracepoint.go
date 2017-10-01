@@ -7,6 +7,8 @@ import (
 	"strings"
 )
 
+// TODO(damien): find where debugfs is mounted
+
 const (
 	traceRoot = "/sys/kernel/debug/tracing/events"
 )
