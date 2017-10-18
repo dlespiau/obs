@@ -13,9 +13,9 @@ const (
 	traceRoot = "/sys/kernel/debug/tracing/events"
 )
 
-// Tracepoint is a linux tracepoint, a static probe placed at compile time in
+// tracepoint is a linux tracepoint, a static probe placed at compile time in
 // the linux kernel.
-type Tracepoint struct {
+type tracepoint struct {
 	// Name is the name of the tracepoint.
 	Name string
 
@@ -23,16 +23,16 @@ type Tracepoint struct {
 	perf *perfSystemEvent
 }
 
-// NewTracepoint creates a Tracepoint. Name is the tracepoint name as listed by:
+// newTracepoint creates a Tracepoint. Name is the tracepoint name as listed by:
 //
 //   $ sudo perf list tracepoint
-func NewTracepoint(name string) *Tracepoint {
-	return &Tracepoint{
+func newTracepoint(name string) *tracepoint {
+	return &tracepoint{
 		Name: name,
 	}
 }
 
-func (tp *Tracepoint) open() error {
+func (tp *tracepoint) open() error {
 	var err error
 
 	// Start by retrieving the event id.
@@ -63,7 +63,7 @@ func (tp *Tracepoint) open() error {
 	return err
 }
 
-func (tp *Tracepoint) close() {
+func (tp *tracepoint) close() {
 	if tp.perf != nil {
 		tp.perf.close()
 	}

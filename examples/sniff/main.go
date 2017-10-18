@@ -14,10 +14,8 @@ func die(err error) {
 }
 
 func main() {
-	exec := obs.NewTracepoint("sched:sched_process_exec")
-
 	observer := obs.NewObserver()
-	observer.AddTracepoint(exec)
+	exec := observer.AddTracepoint("sched:sched_process_exec")
 
 	err := observer.Open()
 	if err != nil {
@@ -30,7 +28,14 @@ func main() {
 			die(err)
 		}
 
-		tp := event.(*obs.TracepointEvent)
-		fmt.Println(hex.Dump(tp.Data()))
+		switch source := event.GetSource(); source {
+		case exec:
+			fmt.Println("---> exec")
+			tp := event.(*obs.TracepointEvent)
+			fmt.Println(hex.Dump(tp.Data()))
+		default:
+			fmt.Fprintf(os.Stderr, "Unknown event source: %d", source)
+		}
+
 	}
 }
