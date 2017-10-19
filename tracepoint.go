@@ -10,7 +10,7 @@ import (
 // TODO(damien): find where debugfs is mounted
 
 const (
-	traceRoot = "/sys/kernel/debug/tracing/events"
+	tracingRoot = "/sys/kernel/debug/tracing"
 )
 
 // tracepoint is a linux tracepoint, a static probe placed at compile time in
@@ -36,7 +36,7 @@ func (tp *tracepoint) open() error {
 	var err error
 
 	// Start by retrieving the event id.
-	idBytes, err := ioutil.ReadFile(traceRoot + "/" + strings.Replace(tp.Name, ":", "/", 1) + "/id")
+	idBytes, err := ioutil.ReadFile(tracingRoot + "/events/" + strings.Replace(tp.Name, ":", "/", 1) + "/id")
 	if err != nil {
 		return err
 	}
