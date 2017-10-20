@@ -236,3 +236,12 @@ func TestDecodeInt(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, bashPID, decoded)
 }
+
+func TestDecodeDynamicString(t *testing.T) {
+	var f format
+
+	f.initFromReader(strings.NewReader(execFormat))
+	decoded, err := f.decodeString(execData, "filename")
+	assert.Nil(t, err)
+	assert.Equal(t, bashCmdline, decoded)
+}

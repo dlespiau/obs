@@ -429,3 +429,31 @@ func (f *format) decodeInt(data []byte, name string) (int, error) {
 
 	return decodeIntInternal(data, field)
 }
+
+func (f *format) decodeString(data []byte, name string) (string, error) {
+	field := f.findField(name)
+	if field == nil {
+		return "", fmt.Errorf("no field named '%s'", name)
+	}
+
+	if field.flags&fieldFlagDynamic != 0 {
+		v, err := decodeIntInternal(data, field)
+		if err != nil {
+			return "", err
+		}
+
+		// Dynamic fields points at a location in the raw sample data: length is the
+		// upper 16 bytes, offset, the lower 16 bytes.
+		field := uint32(v)
+		length := field >> 16
+		offset := field & 0xffff
+		if int(offset+length) > len(data) {
+			return "", fmt.Errorf("dynamic field is beyond data end")
+		}
+		// strings are stored nul-terminated. The -1 is to remove it from the Go
+		// string.
+		return string(data[offset : offset+length-1]), nil
+	}
+
+	return "", fmt.Errorf("don't know how to decode '%s' as a string", name)
+}
