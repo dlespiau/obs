@@ -18,7 +18,7 @@ const (
 	fieldFlagPointer
 	fieldFlagSigned
 	fieldFlagString
-	fieldFlagDynamic
+	fieldFlagDynamic // __data_loc
 	fieldFlagLong
 	fieldFlagFlag
 	fieldFlagSymbolic
@@ -213,10 +213,14 @@ func parseFieldTypeName(str string, out *field) error {
 					return fmt.Errorf("format: unmatched '[' in \"%s\"", str)
 				}
 			}
-		}
-		// The last identifier is the variable name.
-		if t == tokenTypeIdentifier {
-			out.name = token
+		} else if t == tokenTypeIdentifier {
+			switch token {
+			case "__data_loc":
+				out.flags |= fieldFlagDynamic
+			default:
+				// The last identifier is the variable name.
+				out.name = token
+			}
 		}
 
 		token, t = ctx.getToken()

@@ -64,6 +64,14 @@ func TestTokenize(t *testing.T) {
 				{"16", tokenTypeIdentifier},
 				{"]", tokenTypeOperator},
 			},
+		}, {
+			"__data_loc char[] filename", Valid, []tokenOutput{
+				{"__data_loc", tokenTypeIdentifier},
+				{"char", tokenTypeIdentifier},
+				{"[", tokenTypeOperator},
+				{"]", tokenTypeOperator},
+				{"filename", tokenTypeIdentifier},
+			},
 		},
 	}
 
@@ -95,6 +103,7 @@ func TestParseFieldTypeName(t *testing.T) {
 		expected field
 	}{
 		{"field:unsigned short common_type", Valid, field{name: "common_type", flags: 0}},
+		{"field:__data_loc char[] filename", Valid, field{name: "filename", flags: fieldFlagDynamic | fieldFlagArray}},
 	}
 
 	for _, test := range tests {
