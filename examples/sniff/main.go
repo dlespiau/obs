@@ -30,7 +30,7 @@ func main() {
 		switch source := event.GetSource(); source {
 		case exec:
 			tp := event.(*obs.TracepointEvent)
-			fmt.Printf("exec\t%d\n", tp.GetInt("pid"))
+			fmt.Printf("exec\t%d\t%s\n", tp.GetInt("pid"), tp.GetString("filename"))
 		default:
 			fmt.Fprintf(os.Stderr, "Unknown event source: %d", source)
 		}

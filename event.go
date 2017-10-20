@@ -52,3 +52,10 @@ func (e *TracepointEvent) GetInt(name string) int {
 	v, _ := e.tp.format.decodeInt(e.data, name)
 	return v
 }
+
+// GetString retrieves an integer corresponding to the field named 'name' from the
+// tracepoint data. If 'name' isn't a valid field name, GetString returns "".
+func (e *TracepointEvent) GetString(name string) string {
+	v, _ := e.tp.format.decodeString(e.data, name)
+	return v
+}
