@@ -31,8 +31,8 @@ func (e *TracepointEvent) Data() []byte {
 	return e.data
 }
 
-// GetInt retrieves an integer from the field 'name' from the tracepoint data.
-// If 'name' isn't a valid field name, GetInt returns -1.
+// GetInt retrieves an integer corresponding to the field named 'name' from the
+// tracepoint data. If 'name' isn't a valid field name, GetInt returns -1.
 //
 // One can consult the list of per-event fields in its format file:
 //
