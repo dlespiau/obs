@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/hex"
 	"fmt"
 	"os"
 
@@ -30,9 +29,8 @@ func main() {
 
 		switch source := event.GetSource(); source {
 		case exec:
-			fmt.Println("---> exec")
 			tp := event.(*obs.TracepointEvent)
-			fmt.Println(hex.Dump(tp.Data()))
+			fmt.Printf("exec\t%d\n", tp.GetInt("pid"))
 		default:
 			fmt.Fprintf(os.Stderr, "Unknown event source: %d", source)
 		}

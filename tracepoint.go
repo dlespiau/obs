@@ -19,6 +19,10 @@ type tracepoint struct {
 	// Name is the name of the tracepoint.
 	Name string
 
+	// raw data format, from tracingRoot/events/**/**/format. This is used to
+	// decode the raw data incoming from perf events.
+	format format
+
 	// underlying perf events
 	perf *perfSystemEvent
 }
@@ -35,8 +39,10 @@ func newTracepoint(name string) *tracepoint {
 func (tp *tracepoint) open() error {
 	var err error
 
+	tpPath := tracingRoot + "/events/" + strings.Replace(tp.Name, ":", "/", 1)
+
 	// Start by retrieving the event id.
-	idBytes, err := ioutil.ReadFile(tracingRoot + "/events/" + strings.Replace(tp.Name, ":", "/", 1) + "/id")
+	idBytes, err := ioutil.ReadFile(tpPath + "/id")
 	if err != nil {
 		return err
 	}
@@ -46,6 +52,12 @@ func (tp *tracepoint) open() error {
 		return err
 	}
 
+	// Grab the event format.
+	if err := tp.format.initFromFile(tpPath + "/format"); err != nil {
+		return err
+	}
+
+	// Finally, configure perf to receive events.
 	config := perfEventConfig{
 		eventType:  perfTypeTracePoint,
 		sampleType: perfSampleRaw,

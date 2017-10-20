@@ -76,6 +76,7 @@ func (o *Observer) Open() error {
 						baseEvent: baseEvent{
 							source: source,
 						},
+						tp:   tp,
 						data: msg.DataCopy(),
 					}
 					o.events <- event

@@ -2,9 +2,11 @@ package obs
 
 import (
 	"bufio"
+	"encoding/binary"
 	"errors"
 	"fmt"
 	"io"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -364,4 +366,58 @@ func (f *format) initFromReader(r io.Reader) error {
 	}
 
 	return nil
+}
+
+func (f *format) initFromFile(filename string) error {
+	fp, err := os.Open(filename)
+	if err != nil {
+		return err
+	}
+	defer fp.Close()
+	return f.initFromReader(fp)
+}
+
+func (f *format) findField(name string) *field {
+	for i := range f.fields {
+		if f.fields[i].name == name {
+			return &f.fields[i]
+		}
+	}
+
+	return nil
+}
+
+// XXX: if we ever need to support bigEndian machines, this won't be true!
+var nativeEndian = binary.LittleEndian
+
+func (f *format) decodeInt(data []byte, name string) (int, error) {
+	field := f.findField(name)
+	if field == nil {
+		return 0, fmt.Errorf("no field named '%s'", name)
+	}
+
+	switch field.size {
+	case 1:
+		if field.signed {
+			return int(int8(data[field.offset])), nil
+		}
+		return int(data[field.offset]), nil
+	case 2:
+		v := nativeEndian.Uint16(data[field.offset : field.offset+2])
+		if field.signed {
+			return int(int16(v)), nil
+		}
+		return int(v), nil
+	case 4:
+		v := nativeEndian.Uint32(data[field.offset : field.offset+4])
+		if field.signed {
+			return int(int32(v)), nil
+		}
+		return int(v), nil
+	case 8:
+		v := nativeEndian.Uint64(data[field.offset : field.offset+8])
+		return int(v), nil
+	default:
+		return 0, fmt.Errorf("unexpected field size: %d", field.size)
+	}
 }

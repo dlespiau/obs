@@ -193,3 +193,37 @@ func TestParseFormat(t *testing.T) {
 		assert.Equal(t, test.expected, f.fields)
 	}
 }
+
+const execFormat = `
+name: sched_process_exec
+ID: 266
+format:
+	field:unsigned short common_type;	offset:0;	size:2;	signed:0;
+	field:unsigned char common_flags;	offset:2;	size:1;	signed:0;
+	field:unsigned char common_preempt_count;	offset:3;	size:1;	signed:0;
+	field:int common_pid;	offset:4;	size:4;	signed:1;
+
+	field:__data_loc char[] filename;	offset:8;	size:4;	signed:1;
+	field:pid_t pid;	offset:12;	size:4;	signed:1;
+	field:pid_t old_pid;	offset:16;	size:4;	signed:1;
+
+print fmt: "filename=%s pid=%d old_pid=%d", __get_str(filename), REC->pid, REC->old_pid
+`
+
+var execData = []byte{
+	0x0a, 0x01, 0x00, 0x00, 0xb3, 0x01, 0x00, 0x00, 0x14, 0x00, 0x0a, 0x00, 0xb3, 0x01, 0x00, 0x00,
+	0xb3, 0x01, 0x00, 0x00, 0x2f, 0x62, 0x69, 0x6e, 0x2f, 0x62, 0x61, 0x73, 0x68, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00,
+}
+
+const bashCmdline = "/bin/bash"
+const bashPID = 435
+
+func TestDecodeInt(t *testing.T) {
+	var f format
+
+	f.initFromReader(strings.NewReader(execFormat))
+	decoded, err := f.decodeInt(execData, "pid")
+	assert.Nil(t, err)
+	assert.Equal(t, bashPID, decoded)
+}
