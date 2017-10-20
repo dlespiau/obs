@@ -394,12 +394,7 @@ func (f *format) findField(name string) *field {
 // XXX: if we ever need to support bigEndian machines, this won't be true!
 var nativeEndian = binary.LittleEndian
 
-func (f *format) decodeInt(data []byte, name string) (int, error) {
-	field := f.findField(name)
-	if field == nil {
-		return 0, fmt.Errorf("no field named '%s'", name)
-	}
-
+func decodeIntInternal(data []byte, field *field) (int, error) {
 	switch field.size {
 	case 1:
 		if field.signed {
@@ -424,4 +419,13 @@ func (f *format) decodeInt(data []byte, name string) (int, error) {
 	default:
 		return 0, fmt.Errorf("unexpected field size: %d", field.size)
 	}
+}
+
+func (f *format) decodeInt(data []byte, name string) (int, error) {
+	field := f.findField(name)
+	if field == nil {
+		return 0, fmt.Errorf("no field named '%s'", name)
+	}
+
+	return decodeIntInternal(data, field)
 }
