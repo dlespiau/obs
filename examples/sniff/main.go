@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/dlespiau/obs"
 )
@@ -30,7 +31,14 @@ func main() {
 		switch source := event.GetSource(); source {
 		case exec:
 			tp := event.(*obs.TracepointEvent)
-			fmt.Printf("exec\t%d\t%s\n", tp.GetInt("pid"), tp.GetString("filename"))
+			pid := tp.GetInt("pid")
+			process := obs.NewProcess(pid)
+			pidns, err := process.Namespace(obs.PIDNS)
+			pidnsStr := "err"
+			if err == nil {
+				pidnsStr = strconv.FormatUint(pidns, 10)
+			}
+			fmt.Printf("exec\t%d\t% 10s\t%s\n", pid, pidnsStr, tp.GetString("filename"))
 		default:
 			fmt.Fprintf(os.Stderr, "Unknown event source: %d", source)
 		}
