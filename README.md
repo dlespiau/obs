@@ -37,7 +37,7 @@ $ sudo perf list tracepoint
   sched:sched_process_free                           [Tracepoint event]
   sched:sched_process_hang                           [Tracepoint event]
   sched:sched_process_wait                           [Tracepoint event]
-[...
+[...]
 ```
 
 ### Example
